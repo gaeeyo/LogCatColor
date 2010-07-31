@@ -1,3 +1,6 @@
 
-# ���݂܂���Bgihub�̗��K�p�ɓo�^���Ă݂��B
+# すみません。gihubの練習用に登録
+
+
+adb -e logcat | logcatcolor
 
