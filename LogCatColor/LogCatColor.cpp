@@ -123,7 +123,21 @@ int main(int argc, CHAR* argv[])
 		DWORD convertMode = 0;
 
 		BOOL bStartActivity = FALSE;
-		while (gets_s(bufSrc, bufSize) != NULL) {
+		int errorCount = 0;
+		while (true) {
+			if (gets_s(bufSrc, bufSize) == NULL) {
+				// 文字列として異常なデータ(0x20以下のコードなど)を受信すると、
+				// 終端に達していないのにNULLが返されることがあり、この場合の判別方法が不明なので
+				// 暫定的に、NULLが返された回数をカウントして、1000回続いたら終了とみなす
+				fseek(stdin, 1, SEEK_CUR);
+				errorCount++;
+				if (errorCount > 1000) {
+					break;
+				}
+				continue;
+			}
+			errorCount = 0;
+
 			UINT bufSrcSize = bufSize;
 			UINT bufDstSize = bufSize;
 			hr = im->ConvertString(&convertMode, 65001, 932, 
