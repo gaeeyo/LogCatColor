@@ -115,6 +115,7 @@ int main(int argc, CHAR* argv[])
 
 	// 標準入力の読み出しのループ
 	{
+		const CHAR *validLogType = "VDIWEF";
 		const UINT bufSize = 10000;
 		CHAR bufSrc[bufSize+1] = {0};
 		CHAR bufDst[bufSize+1] = {0};
@@ -148,17 +149,29 @@ int main(int argc, CHAR* argv[])
 			}
 
 			WORD attr = FOREGROUND_WHITE;
-			switch (bufSrc[0]) {
-			case L'W':
+
+			CHAR logType;
+			if (strchr(validLogType, bufSrc[0]) != NULL) {
+				logType = bufSrc[0];
+			}
+			else if (strchr(validLogType, bufSrc[19]) != NULL) {	// -v time
+				logType = bufSrc[19];
+			}
+			else if (strchr(validLogType, bufSrc[31]) != NULL) {	// -v threadtime
+				logType = bufSrc[31];
+			}
+
+			switch (logType) {
+			case 'W':
 				attr = FOREGROUND_YELLOW | FOREGROUND_INTENSITY;
 				break;
-			case L'I':
+			case 'I':
 				attr = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
 				if (bStartActivity && TestStartActivity(bufSrc, cmp, pid, sizeof(pid))) {	
 					// インストールされたパッケージのpidを取得
 				}
 				break;
-			case L'D':
+			case 'D':
 				attr = FOREGROUND_CYAN | FOREGROUND_INTENSITY;
 				if (TestInstallPackage(bufSrc)) {	// パッケージのインストールを検出
 					if (GetInstalledPackageName(bufSrc, cmp, sizeof(cmp))) {
@@ -169,10 +182,10 @@ int main(int argc, CHAR* argv[])
 					}
 				}
 				break;
-			case L'V':
+			case 'V':
 				attr = FOREGROUND_WHITE;
 				break;
-			case L'E':
+			case 'E':
 				attr = FOREGROUND_RED | FOREGROUND_INTENSITY;
 				break;
 			default:
